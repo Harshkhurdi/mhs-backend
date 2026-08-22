@@ -16,9 +16,12 @@ mhs-backend/
 │       ├── 004_add_is_published.sql        # Draft/Publish status control
 │       ├── 005_create_storage_bucket.sql   # Storage bucket for brochures/images
 │       └── 006_create_inquiries.sql        # Contact form & RFQ inquiries table
-├── .env.example                            # Supabase keys template
 └── README.md
 ```
+
+> **Note:** This repository requires no environment variables. It contains only SQL
+> migrations applied one-time in the Supabase SQL Editor. The Supabase URL and anon
+> key used by the app live in the frontend (`mhs-frontend/.env`) only.
 
 ---
 
