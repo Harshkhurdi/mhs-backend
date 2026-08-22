@@ -14,7 +14,8 @@ mhs-backend/
 │       ├── 002_seed_products.sql           # Initial OEM equipment catalog
 │       ├── 003_rls_policies.sql            # Public read / Authenticated write rules
 │       ├── 004_add_is_published.sql        # Draft/Publish status control
-│       └── 005_create_storage_bucket.sql   # Storage bucket for brochures/images
+│       ├── 005_create_storage_bucket.sql   # Storage bucket for brochures/images
+│       └── 006_create_inquiries.sql        # Contact form & RFQ inquiries table
 ├── .env.example                            # Supabase keys template
 └── README.md
 ```
@@ -24,7 +25,7 @@ mhs-backend/
 ## 🗄 Database & Supabase Setup Flow
 
 ### 1. Apply Database Migrations
-In your **Supabase Dashboard** -> **SQL Editor**, run the migration files in numerical order (`001` through `005`).
+In your **Supabase Dashboard** -> **SQL Editor**, run the migration files in numerical order (`001` through `006`).
 
 ### 2. Create Admin Account
 Public self-registration is disabled for security. Create the initial administrative user via:
