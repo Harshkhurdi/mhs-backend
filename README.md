@@ -1,6 +1,6 @@
-# Medelec Healthcare Solutions (MHS) — Backend & Database Schema
+# Medelec Healthcare Solutions (MHS) — Backend & Firebase Configuration
 
-Database migrations, seed data, and Row-Level Security (RLS) configuration for **Medelec Healthcare Solutions**.
+Firebase **security rules** for **Medelec Healthcare Solutions** — Firestore rules that replace the previous Supabase RLS policies.
 
 ---
 
@@ -8,43 +8,42 @@ Database migrations, seed data, and Row-Level Security (RLS) configuration for *
 
 ```
 mhs-backend/
-├── supabase/
-│   └── migrations/
-│       ├── 001_create_products.sql         # Base products schema & constraints
-│       ├── 002_seed_products.sql           # Initial OEM equipment catalog
-│       ├── 003_rls_policies.sql            # Public read / Authenticated write rules
-│       ├── 004_add_is_published.sql        # Draft/Publish status control
-│       ├── 005_create_storage_bucket.sql   # Storage bucket for brochures/images
-│       └── 006_create_inquiries.sql        # Contact form & RFQ inquiries table
-└── README.md
+└── firestore.rules    # Firestore rules: products catalog + inquiries
 ```
 
-> **Note:** This repository requires no environment variables. It contains only SQL
-> migrations applied one-time in the Supabase SQL Editor. The Supabase URL and anon
-> key used by the app live in the frontend (`mhs-frontend/.env`) only.
+> **Note:** This repository requires no environment variables. The Firebase web
+> app configuration used by the site lives in the frontend (`mhs-frontend/.env`) only.
+>
+> **Media hosting:** product images and PDF brochures are referenced by URL —
+> host the files anywhere (company web space, the manufacturer's site, or any
+> static host) and paste the link in the admin dashboard. Firebase Storage is
+> not used because it requires the paid Blaze plan on new projects.
 
 ---
 
-## 🗄 Database & Supabase Setup Flow
+## 🗄 Firebase Setup Flow
 
-### 1. Apply Database Migrations
-In your **Supabase Dashboard** -> **SQL Editor**, run the migration files in numerical order (`001` through `006`).
+### 1. Create Firestore Database
+In the **Firebase console** (project `mhs-project-7235e`) → **Firestore Database** → **Create database** (Production mode).
 
-### 2. Create Admin Account
-Public self-registration is disabled for security. Create the initial administrative user via:
-- **Supabase Dashboard** -> **Authentication** -> **Users** -> **Add User** -> **Create User**
-- Use an authorized company email address and set a secure password.
+### 2. Publish Firestore Rules
+**Firestore Database** → **Rules** → replace the contents with `firestore.rules` from this repository → **Publish**.
 
-### 3. Verify Storage Bucket
-Run `005_create_storage_bucket.sql` to instantiate the `product-media` public bucket for PDF datasheets and product photography.
+### 3. Enable Authentication & Create the Admin Account
+- **Authentication** → **Sign-in method** → enable **Email/Password**.
+- Public self-registration is disabled for security. Create the administrative user via:
+  **Authentication** → **Users** → **Add user** — use an authorized company email address and a secure password.
 
 ---
 
 ## 🛡 Security Rules Overview
 
-- **`products` Table**:
-  - `SELECT`: Public (anon role) — filtered by `is_published = true` on the frontend.
-  - `INSERT`, `UPDATE`, `DELETE`: Authenticated admin users only.
-- **`product-media` Storage Bucket**:
-  - `SELECT`: Public access.
-  - `INSERT`, `UPDATE`, `DELETE`: Authenticated admin users only.
+- **`products` collection** (medical equipment catalog):
+  - `read`: Public — filtered by `is_published = true`; authenticated admins read everything, including drafts.
+  - `create`, `update`, `delete`: Authenticated admin users only.
+- **`inquiries` collection** (contact form & RFQ submissions):
+  - `create`: Public — any visitor can submit.
+  - `read`: Authenticated admin users only. No `update`/`delete`, same as before.
+- **Product media** (product photography & PDF datasheets):
+  - Referenced by public URL; hosted outside Firebase.
+
